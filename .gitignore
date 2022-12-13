@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 /.idea/
 /private_config.ini
+/daily_stand_up_bot/private_config.py
