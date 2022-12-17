@@ -113,7 +113,22 @@ async def slack_interactive(payload: dict):
     )
     return {"message": "Slack interactive message"}
 
-
+# handle slack events
+@app.post("/slack/events")
+async def slack_events(payload: dict):
+    """
+    Handle slack events
+    """
+    # check challenge
+    if "challenge" in payload:
+        return {"challenge": payload["challenge"]}
+    slack_controller = SlackController(team_id=payload["team_id"])
+    message = payload["event"]["text"]
+    user_id = payload["event"]["user"]
+    slack_controller.forward_message_to_general_channel(
+        user_id, message, chanel_id="general"
+    )
+    return {"message": "Slack events"}
 
 if __name__ == "__main__":
     import uvicorn
