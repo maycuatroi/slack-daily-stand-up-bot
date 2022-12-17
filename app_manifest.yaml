@@ -1,0 +1,21 @@
+display_information:
+  name: B's Tavern
+  description: Meta X Daily stand up Apps, using by MetaX team internally
+  background_color: "#13007d"
+features:
+  bot_user:
+    display_name: Meta X Daily stand up
+    always_online: false
+oauth_config:
+  scopes:
+    bot:
+      - chat:write
+      - chat:write.public
+      - channels:read
+      - users:read
+  redirect_urls:
+    - https://metax-daily-standup.herokuapp.com/oauth # Path: app_manifest.yaml
+settings:
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false

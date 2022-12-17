@@ -1,2 +1,3 @@
 slack-sdk
 fastapi
+firebase_admin

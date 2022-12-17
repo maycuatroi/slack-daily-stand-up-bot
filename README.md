@@ -18,3 +18,7 @@ _start((Start))-->get_all_users(Get all users)
 --> finish((Finish))
 ```
 
+# Overview
+
+User using oAuth to authenticate with slack and then the auth token is stored in the database.
+Database is using Firebase.
