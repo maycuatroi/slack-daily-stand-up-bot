@@ -19,9 +19,12 @@ app = FastAPI()
 
 @app.post("/daily")
 async def daily():
-    user_controller = SlackController()
-    users = user_controller.get_all_users()
-
+    slack_controller = SlackController()
+    slack_controller.send_message_to_all_users(
+        "Hello {user.real_name}! :wave: It's time for Daily Standup in #general. "
+        "Please share what you've been working on.\n"
+        "How do you feel today?"
+    )
     return {"message": "Daily"}
 
 
@@ -86,6 +89,8 @@ async def slack_oauth(code: str, state: str):
     authed_user = auth_response["authed_user"]
     authed_user_id = authed_user["id"]
     user_controller.save_user(authed_user_id, auth_response)
+
+    return {"message": "Slack oauth success"}
 
 
 if __name__ == "__main__":
