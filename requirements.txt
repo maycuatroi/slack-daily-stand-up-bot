@@ -1,3 +1,4 @@
 slack-sdk
 fastapi
 firebase_admin
+sentry-sdk[fastapi]

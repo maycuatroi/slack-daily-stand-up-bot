@@ -2,11 +2,17 @@
 Create one time trigger, auto trigger when https request is received.
 """
 import requests
+import sentry_sdk
 from fastapi import FastAPI
 
 from daily_stand_up_bot import config
 from daily_stand_up_bot.controllers.slack_controller import SlackController
 from daily_stand_up_bot.controllers.user_controller import UserController
+
+sentry_sdk.init(
+    dsn=config.SENTRY_DNS,
+    traces_sample_rate=1.0,
+)
 
 app = FastAPI()
 
@@ -82,9 +88,7 @@ async def slack_oauth(code: str, state: str):
     user_controller.save_user(authed_user_id, auth_response)
 
 
-
-
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="localhost", port=8000, log_level="info")
+    uvicorn.run(app, host="localhost", port=8080, log_level="info")
