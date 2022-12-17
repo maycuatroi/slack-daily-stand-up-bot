@@ -6,6 +6,7 @@ import sentry_sdk
 from fastapi import FastAPI
 
 from daily_stand_up_bot import config
+from daily_stand_up_bot.controllers.db_controller import DatabaseController
 from daily_stand_up_bot.controllers.slack_controller import SlackController
 from daily_stand_up_bot.controllers.user_controller import UserController
 
@@ -18,8 +19,8 @@ app = FastAPI()
 
 
 @app.post("/daily")
-async def daily():
-    slack_controller = SlackController()
+async def daily(team_id: str):
+    slack_controller = SlackController(team_id=team_id)
     slack_controller.send_message_to_all_users(
         "Hello {user.real_name}! :wave: It's time for Daily Standup in #general. "
         "Please share what you've been working on.\n"
@@ -89,6 +90,11 @@ async def slack_oauth(code: str, state: str):
     authed_user = auth_response["authed_user"]
     authed_user_id = authed_user["id"]
     user_controller.save_user(authed_user_id, auth_response)
+
+    team_id = auth_response["team"]["id"]
+    access_token = auth_response["access_token"]
+    dbc = DatabaseController()
+    dbc.add_access_token(team_id, access_token)
 
     return {"message": "Slack oauth success"}
 

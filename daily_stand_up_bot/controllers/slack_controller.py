@@ -4,12 +4,21 @@ from slack.web import client
 from slack_sdk import WebClient
 
 from daily_stand_up_bot import config
+from daily_stand_up_bot.controllers.db_controller import DatabaseController
 from daily_stand_up_bot.entities.user import User
 
 
 class SlackController:
-    def __init__(self):
-        self.client = WebClient(token=config.TOKEN)
+    def __init__(self, team_id: str = None):
+        self.team_id = team_id
+        if team_id is not None:
+            # get token from database
+            dbc = DatabaseController()
+            token = dbc.get_access_token_by_team_id(team_id)
+        else:
+            token = config.TOKEN
+
+        self.client = WebClient(token=token)
 
     def get_all_users(self) -> typing.List[User]:
         """
@@ -34,7 +43,7 @@ class SlackController:
         users = self.get_all_users()
         for user in users:
 
-            #format mesage with user real name
+            # format mesage with user real name
             message = message_template.format(user=user)
 
             self.send_message(user.id, message)
@@ -42,4 +51,6 @@ class SlackController:
 
 if __name__ == "__main__":
     slack_controller = SlackController()
-    slack_controller.send_message_to_all_users("Hello {user.real_name}, how are you today?")
+    slack_controller.send_message_to_all_users(
+        "Hello {user.real_name}, how are you today?"
+    )
