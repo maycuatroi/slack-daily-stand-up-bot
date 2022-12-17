@@ -3,3 +3,4 @@ fastapi
 firebase_admin
 sentry-sdk[fastapi]
 uvicorn
+python-dotenv
