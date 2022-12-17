@@ -5,7 +5,7 @@ import os
 
 import requests
 import sentry_sdk
-from fastapi import FastAPI,Request
+from fastapi import FastAPI
 
 from daily_stand_up_bot import config
 from daily_stand_up_bot.controllers.db_controller import DatabaseController
@@ -118,15 +118,13 @@ async def slack_interactive(payload: dict):
 
 # handle slack events
 @app.post("/slack/events")
-async def slack_events(request: Request):
+async def slack_events(payload: dict):
     """
     Handle slack events
     """
     # check challenge
-    if request.query_params.get("challenge"):
-        return {"challenge": request.query_params.get("challenge")}
-    # handle event
-    payload = await request.json()
+    if "challenge" in payload:
+        return {"challenge": payload["challenge"]}
     slack_controller = SlackController(team_id=payload["team_id"])
     message = payload["event"]["text"]
     user_id = payload["event"]["user"]

@@ -13,9 +13,9 @@ def test_challenge():
     payload = {
         "challenge": challenge,
     }
-    url = f"{BASE_ENDPOINT}/slack/events/"
+    url = f"{BASE_ENDPOINT}/slack/events"
 
-    response = requests.post(url, params=payload)
+    response = requests.post(url, json=payload)
     assert response.status_code == 200
     assert response.json() == {"challenge": challenge}
 
