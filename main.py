@@ -1,19 +1,22 @@
 """
 Create one time trigger, auto trigger when https request is received.
 """
+import os
+
 import requests
 import sentry_sdk
-from fastapi import FastAPI
+from fastapi import FastAPI,Request
 
 from daily_stand_up_bot import config
 from daily_stand_up_bot.controllers.db_controller import DatabaseController
 from daily_stand_up_bot.controllers.slack_controller import SlackController
 from daily_stand_up_bot.controllers.user_controller import UserController
 
-sentry_sdk.init(
-    dsn=config.SENTRY_DNS,
-    traces_sample_rate=1.0,
-)
+if os.getenv("DOCKER_CONTAINER"):
+    sentry_sdk.init(
+        dsn=config.SENTRY_DNS,
+        traces_sample_rate=1.0,
+    )
 
 app = FastAPI()
 
@@ -115,13 +118,15 @@ async def slack_interactive(payload: dict):
 
 # handle slack events
 @app.post("/slack/events")
-async def slack_events(payload: dict):
+async def slack_events(request: Request):
     """
     Handle slack events
     """
     # check challenge
-    if "challenge" in payload:
-        return {"challenge": payload["challenge"]}
+    if request.query_params.get("challenge"):
+        return {"challenge": request.query_params.get("challenge")}
+    # handle event
+    payload = await request.json()
     slack_controller = SlackController(team_id=payload["team_id"])
     message = payload["event"]["text"]
     user_id = payload["event"]["user"]

@@ -1,0 +1,2 @@
+httpx
+protobuf==3.20.*
