@@ -99,6 +99,22 @@ async def slack_oauth(code: str, state: str):
     return {"message": "Slack oauth success"}
 
 
+# handle slack interactive message
+@app.post("/slack/interactive")
+async def slack_interactive(payload: dict):
+    """
+    Handle slack interactive message
+    """
+    slack_controller = SlackController(team_id=payload["team"]["id"])
+    message = payload["actions"][0]["value"]
+    user_id = payload["user"]["id"]
+    slack_controller.forward_message_to_general_channel(
+        user_id, message, chanel_id="general"
+    )
+    return {"message": "Slack interactive message"}
+
+
+
 if __name__ == "__main__":
     import uvicorn
 

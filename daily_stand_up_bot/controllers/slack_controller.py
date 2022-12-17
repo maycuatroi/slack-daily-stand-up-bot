@@ -1,7 +1,5 @@
 import typing
-
-from slack.web import client
-from slack_sdk import WebClient
+import slack_sdk
 
 from daily_stand_up_bot import config
 from daily_stand_up_bot.controllers.db_controller import DatabaseController
@@ -18,7 +16,7 @@ class SlackController:
         else:
             token = config.TOKEN
 
-        self.client = WebClient(token=token)
+        self.client = slack_sdk.WebClient(token=token)
 
     def get_all_users(self) -> typing.List[User]:
         """
@@ -48,9 +46,20 @@ class SlackController:
 
             self.send_message(user.id, message)
 
+    def forward_message_to_general_channel(self, user_id, message, chanel_id="general"):
+        """
+        Forward message to general channel
+        """
+        message_template = f"""
+        <@{user_id}> have a great day!:
+        "{message}"
+        """
+        self.client.chat_postMessage(channel=chanel_id, text=message_template)
+
 
 if __name__ == "__main__":
     slack_controller = SlackController()
-    slack_controller.send_message_to_all_users(
-        "Hello {user.real_name}, how are you today?"
+    slack_controller.forward_message_to_general_channel(
+        "U04FEGY7JHE",
+        "I am fine, thank you! To day I am going to do some work on my project",
     )
