@@ -17,7 +17,7 @@ def load_config():
     __is_loaded = True
     import dotenv
 
-    dotenv.load_dotenv('.env')
+    dotenv.load_dotenv(".env")
 
     global TOKEN, CLIENT_SECRET, CLIENT_ID, FIREBASE_SERVICE_ACCOUNT_KEY, SENTRY_DNS
     TOKEN = os.environ.get("TOKEN")  # YOUR_TOKEN

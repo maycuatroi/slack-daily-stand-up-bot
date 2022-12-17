@@ -1,6 +1,7 @@
 """
 Database controller using firebase Firestore
 """
+from datetime import datetime, timedelta, timezone
 
 import firebase_admin
 from firebase_admin import credentials
@@ -38,3 +39,37 @@ class DatabaseController:
         """
         doc_ref = self.db.collection("teams").document(team_id)
         doc_ref.set({"access_token": access_token})
+
+    def is_user_answered_question(self, user_id, key, date):
+        """
+        Check if user has already answered question
+        Document path: /answers/{user_id}/{date}/{key}
+        """
+        doc_ref = self.db.collection("answers").document(user_id).collection(date)
+        doc = doc_ref.document(key).get()
+        return doc.exists
+    def is_user_answered_all_question(self, total_question, user_id, date):
+        """
+        Check if user has answered all question
+        Document path: /answers/{user_id}/{date}
+        """
+        doc_ref = self.db.collection("answers").document(user_id).collection(date)
+        docs = doc_ref.stream()
+        return len(list(docs)) == total_question
+
+    def get_user_answers(self, user_id, date):
+        """
+        Get user answers
+        Document path: /answers/{user_id}/{date}
+        """
+        doc_ref = self.db.collection("answers").document(user_id).collection(date)
+        docs = doc_ref.stream()
+        return docs
+
+    def save_answer(self, user_id, key, answer, today):
+        """
+        Save user answer
+        Document path: /answers/{user_id}/{date}/{key}
+        """
+        doc_ref = self.db.collection("answers").document(user_id).collection(today)
+        doc_ref.document(key).set({"answer": answer})

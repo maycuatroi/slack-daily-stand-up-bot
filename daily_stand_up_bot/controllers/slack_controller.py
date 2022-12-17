@@ -7,7 +7,7 @@ from daily_stand_up_bot.entities.user import User
 
 
 class SlackController:
-    def __init__(self, team_id: str = None):
+    def __init__(self, team_id: str):
         self.team_id = team_id
         if team_id is not None:
             # get token from database
@@ -46,20 +46,21 @@ class SlackController:
 
             self.send_message(user.id, message)
 
-    def forward_message_to_general_channel(self, user_id, message, chanel_id="general"):
-        """
-        Forward message to general channel
-        """
-        message_template = f"""
-        <@{user_id}> have a great day!:
-        "{message}"
-        """
-        self.client.chat_postMessage(channel=chanel_id, text=message_template)
+    def post_message(self, channel_id, message):
+        self.client.chat_postMessage(channel=channel_id, text=message)
+
+    def send_message_to_user(self, user_id, message):
+        self.client.chat_postMessage(channel=user_id, text=message)
+
+    def get_my_last_message(self, user_id):
+        bot_id = self.client.auth_test()["user_id"]
+        result = self.client.conversations_history(channel=user_id)
+        messages = result["messages"]
+        for message in messages:
+            if message["user"] == bot_id:
+                return message["text"]
 
 
 if __name__ == "__main__":
-    slack_controller = SlackController()
-    slack_controller.forward_message_to_general_channel(
-        "U04FEGY7JHE",
-        "I am fine, thank you! To day I am going to do some work on my project",
-    )
+    sc = SlackController("T04EQRKHY3C")
+    sc.get_my_last_message("U04FEGY7JHE")

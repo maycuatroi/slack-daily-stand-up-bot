@@ -8,6 +8,7 @@ import sentry_sdk
 from fastapi import FastAPI
 
 from daily_stand_up_bot import config
+from daily_stand_up_bot.controllers.daily_controller import DailyController
 from daily_stand_up_bot.controllers.db_controller import DatabaseController
 from daily_stand_up_bot.controllers.slack_controller import SlackController
 from daily_stand_up_bot.controllers.user_controller import UserController
@@ -24,11 +25,10 @@ app = FastAPI()
 @app.post("/daily")
 async def daily(team_id: str):
     slack_controller = SlackController(team_id=team_id)
-    slack_controller.send_message_to_all_users(
-        "Hello {user.real_name}! :wave: It's time for Daily Standup in #general. "
-        "Please share what you've been working on.\n"
-        "How do you feel today?"
-    )
+    users = slack_controller.get_all_users()
+    daily_controller = DailyController(team_id=team_id)
+    for user in users:
+        daily_controller.start(user.id)
     return {"message": "Daily"}
 
 
@@ -108,13 +108,10 @@ async def slack_interactive(payload: dict):
     """
     Handle slack interactive message
     """
-    slack_controller = SlackController(team_id=payload["team"]["id"])
-    message = payload["actions"][0]["value"]
-    user_id = payload["user"]["id"]
-    slack_controller.forward_message_to_general_channel(
-        user_id, message, chanel_id="general"
+    raise NotImplementedError(
+        "This is not implemented yet. Please use slack events api instead"
     )
-    return {"message": "Slack interactive message"}
+
 
 # handle slack events
 @app.post("/slack/events")
@@ -125,13 +122,13 @@ async def slack_events(payload: dict):
     # check challenge
     if "challenge" in payload:
         return {"challenge": payload["challenge"]}
-    slack_controller = SlackController(team_id=payload["team_id"])
     message = payload["event"]["text"]
     user_id = payload["event"]["user"]
-    slack_controller.forward_message_to_general_channel(
-        user_id, message, chanel_id="general"
-    )
+    daily_controller = DailyController(team_id=payload["team_id"])
+    daily_controller.answer(user_id, message)
+
     return {"message": "Slack events"}
+
 
 if __name__ == "__main__":
     import uvicorn
