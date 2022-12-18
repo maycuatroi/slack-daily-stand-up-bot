@@ -72,7 +72,7 @@ How do you feel today?""",
                            <@{user_id}> have a great day!:
                            """
         for key, question in self.QUESTIONS.items():
-            answers = self.dbc.get_user_answers(user_id, key, today)
+            answers = self.dbc.get_user_answers(user_id, today)
             answer = answers[key]
             message_template += f"""
                                 {question}
